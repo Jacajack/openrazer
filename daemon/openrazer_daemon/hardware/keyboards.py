@@ -1809,4 +1809,4 @@ class RazerBlackWidowV4Pro(_RippleKeyboard):
                'set_starlight_random_effect', 'set_starlight_single_effect', 'set_starlight_dual_effect',
                'set_ripple_effect', 'set_ripple_effect_random_colour']
 
-    DEVICE_IMAGE = "https://dl.razerzone.com/src/3809-1-EN-v1.png" # FIXME
+    DEVICE_IMAGE = "https://dl.razerzone.com/src2/9703/9703-1-en-v1.png"
