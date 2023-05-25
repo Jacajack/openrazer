@@ -1526,6 +1526,32 @@ static ssize_t razer_attr_write_matrix_effect_wave(struct device *dev, struct de
 }
 
 /**
+ * Write device file "matrix_effect_wheel"
+ *
+ * When 1 is written (as a character, 0x31) the wheel effect is turning right
+ * if 2 is written (0x32) then the wheel effect goes left.
+ *
+ */
+static ssize_t razer_attr_write_matrix_effect_wheel(struct device *dev, struct device_attribute *attr, const char *buf, size_t count)
+{
+    struct usb_interface *intf = to_usb_interface(dev->parent);
+    struct usb_device *usb_dev = interface_to_usbdev(intf);
+    unsigned char direction = (unsigned char)simple_strtoul(buf, NULL, 10);
+    struct razer_report request = {0};
+    struct razer_report response = {0};
+
+    switch(usb_dev->descriptor.idProduct) {
+    case USB_DEVICE_ID_RAZER_BLACKWIDOW_V4_PRO:
+        request = razer_chroma_extended_matrix_effect_wheel(VARSTORE, BACKLIGHT_LED, direction);
+        request.transaction_id.id = 0x1F;
+        break;
+    }
+    razer_send_payload(usb_dev, &request, &response);
+
+    return count;
+}
+
+/**
  * Write device file "matrix_effect_spectrum"
  *
  * Specrum effect mode is activated whenever the file is written to
@@ -2918,6 +2944,7 @@ static DEVICE_ATTR(device_serial,           0440, razer_attr_read_device_serial,
 
 static DEVICE_ATTR(matrix_effect_none,      0220, NULL,                                       razer_attr_write_matrix_effect_none);
 static DEVICE_ATTR(matrix_effect_wave,      0220, NULL,                                       razer_attr_write_matrix_effect_wave);
+static DEVICE_ATTR(matrix_effect_wheel,     0220, NULL,                                       razer_attr_write_matrix_effect_wheel);
 static DEVICE_ATTR(matrix_effect_spectrum,  0220, NULL,                                       razer_attr_write_matrix_effect_spectrum);
 static DEVICE_ATTR(matrix_effect_reactive,  0220, NULL,                                       razer_attr_write_matrix_effect_reactive);
 static DEVICE_ATTR(matrix_effect_static,    0220, NULL,                                       razer_attr_write_matrix_effect_static);
@@ -3532,7 +3559,22 @@ static int razer_kbd_probe(struct hid_device *hdev, const struct hid_device_id *
         case USB_DEVICE_ID_RAZER_BLACKWIDOW_CHROMA_V2:
         case USB_DEVICE_ID_RAZER_CYNOSA_V2:
         case USB_DEVICE_ID_RAZER_BLACKWIDOW_V3_TK:
+            CREATE_DEVICE_FILE(&hdev->dev, &dev_attr_matrix_effect_wave);            // Wave effect
+            CREATE_DEVICE_FILE(&hdev->dev, &dev_attr_matrix_effect_spectrum);        // Spectrum effect
+            CREATE_DEVICE_FILE(&hdev->dev, &dev_attr_matrix_effect_starlight);       // Starlight effect
+            CREATE_DEVICE_FILE(&hdev->dev, &dev_attr_matrix_effect_none);            // No effect
+            CREATE_DEVICE_FILE(&hdev->dev, &dev_attr_matrix_effect_reactive);        // Reactive effect
+            CREATE_DEVICE_FILE(&hdev->dev, &dev_attr_matrix_effect_breath);          // Breathing effect
+            CREATE_DEVICE_FILE(&hdev->dev, &dev_attr_matrix_effect_static);          // Static effect
+            CREATE_DEVICE_FILE(&hdev->dev, &dev_attr_matrix_effect_custom);          // Custom effect
+            CREATE_DEVICE_FILE(&hdev->dev, &dev_attr_matrix_custom_frame);           // Set LED matrix
+            CREATE_DEVICE_FILE(&hdev->dev, &dev_attr_game_led_state);                // Enable game mode & LED
+            CREATE_DEVICE_FILE(&hdev->dev, &dev_attr_macro_led_state);               // Enable macro LED
+            CREATE_DEVICE_FILE(&hdev->dev, &dev_attr_macro_led_effect);              // Change macro LED effect (static, flashing)
+            break;
+
         case USB_DEVICE_ID_RAZER_BLACKWIDOW_V4_PRO:
+            CREATE_DEVICE_FILE(&hdev->dev, &dev_attr_matrix_effect_wheel);           // Wheel effect
             CREATE_DEVICE_FILE(&hdev->dev, &dev_attr_matrix_effect_wave);            // Wave effect
             CREATE_DEVICE_FILE(&hdev->dev, &dev_attr_matrix_effect_spectrum);        // Spectrum effect
             CREATE_DEVICE_FILE(&hdev->dev, &dev_attr_matrix_effect_starlight);       // Starlight effect
@@ -3951,7 +3993,22 @@ static void razer_kbd_disconnect(struct hid_device *hdev)
         case USB_DEVICE_ID_RAZER_BLACKWIDOW_CHROMA_V2:
         case USB_DEVICE_ID_RAZER_CYNOSA_V2:
         case USB_DEVICE_ID_RAZER_BLACKWIDOW_V3_TK:
+            device_remove_file(&hdev->dev, &dev_attr_matrix_effect_wave);            // Wave effect
+            device_remove_file(&hdev->dev, &dev_attr_matrix_effect_spectrum);        // Spectrum effect
+            device_remove_file(&hdev->dev, &dev_attr_matrix_effect_starlight);       // Starlight effect
+            device_remove_file(&hdev->dev, &dev_attr_matrix_effect_none);            // No effect
+            device_remove_file(&hdev->dev, &dev_attr_matrix_effect_reactive);        // Reactive effect
+            device_remove_file(&hdev->dev, &dev_attr_matrix_effect_breath);          // Breathing effect
+            device_remove_file(&hdev->dev, &dev_attr_matrix_effect_static);          // Static effect
+            device_remove_file(&hdev->dev, &dev_attr_matrix_effect_custom);          // Custom effect
+            device_remove_file(&hdev->dev, &dev_attr_matrix_custom_frame);           // Set LED matrix
+            device_remove_file(&hdev->dev, &dev_attr_game_led_state);                // Enable game mode & LED
+            device_remove_file(&hdev->dev, &dev_attr_macro_led_state);               // Enable macro LED
+            device_remove_file(&hdev->dev, &dev_attr_macro_led_effect);              // Change macro LED effect (static, flashing)
+            break;
+
         case USB_DEVICE_ID_RAZER_BLACKWIDOW_V4_PRO:
+            device_remove_file(&hdev->dev, &dev_attr_matrix_effect_wheel);           // Wheel
             device_remove_file(&hdev->dev, &dev_attr_matrix_effect_wave);            // Wave effect
             device_remove_file(&hdev->dev, &dev_attr_matrix_effect_spectrum);        // Spectrum effect
             device_remove_file(&hdev->dev, &dev_attr_matrix_effect_starlight);       // Starlight effect
