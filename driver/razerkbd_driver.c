@@ -1545,6 +1545,10 @@ static ssize_t razer_attr_write_matrix_effect_wheel(struct device *dev, struct d
         request = razer_chroma_extended_matrix_effect_wheel(VARSTORE, BACKLIGHT_LED, direction);
         request.transaction_id.id = 0x1F;
         break;
+
+    default:
+        printk(KERN_WARNING "razerkbd: matrix_effect_wheel not supported for this model\n");
+        return -EINVAL;
     }
     razer_send_payload(usb_dev, &request, &response);
 
