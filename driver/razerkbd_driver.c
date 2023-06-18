@@ -3343,6 +3343,7 @@ static int razer_kbd_input_mapping(struct hid_device *hdev, struct hid_input *hi
     switch (hdev->product) {
     case USB_DEVICE_ID_RAZER_BLACKWIDOW_V3:
     case USB_DEVICE_ID_RAZER_BLACKWIDOW_V3_PRO_WIRED:
+    case USB_DEVICE_ID_RAZER_BLACKWIDOW_V4_PRO:
     case USB_DEVICE_ID_RAZER_BLACKWIDOW_ELITE:
     case USB_DEVICE_ID_RAZER_DEATHSTALKER_V2:
     case USB_DEVICE_ID_RAZER_HUNTSMAN_ELITE:
