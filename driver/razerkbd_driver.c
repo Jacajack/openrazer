@@ -3148,6 +3148,18 @@ static int razer_raw_event_standard(struct hid_device *hdev, struct razer_kbd_de
             case 0x54: // Prev (song)
                 cur_value = USB_HID_KEY_MEDIA_PREVIOUSSONG;
                 break;
+            case 0x60: // BlackWidow V4 Pro command dial button
+                cur_value = USB_HID_KEY_F24; // F24 (not sure if we want it this way)
+                break;
+            case 0x63: // BlackWidow V4 Pro Side button 1
+                cur_value = USB_HID_KEY_F18; // F18
+                break;
+            case 0x64: // BlackWidow V4 Pro Side button 2
+                cur_value = USB_HID_KEY_F19; // F19
+                break;
+            case 0x65: // BlackWidow V4 Pro Side button 3
+                cur_value = USB_HID_KEY_F20; // F20
+                break;
             }
 
             data[index+1] = cur_value;
@@ -3233,6 +3245,18 @@ static int razer_raw_event_bitfield(struct hid_device *hdev, struct razer_kbd_de
                 break;
             case 0x54: // Prev (song)
                 cur_value = USB_HID_KEY_MEDIA_PREVIOUSSONG;
+                break;
+            case 0x60: // BlackWidow V4 Pro command dial button
+                cur_value = USB_HID_KEY_F24; // F24 (not sure if we want it this way)
+                break;
+            case 0x63: // BlackWidow V4 Pro Side button 1
+                cur_value = USB_HID_KEY_F18; // F18
+                break;
+            case 0x64: // BlackWidow V4 Pro Side button 2
+                cur_value = USB_HID_KEY_F19; // F19
+                break;
+            case 0x65: // BlackWidow V4 Pro Side button 3
+                cur_value = USB_HID_KEY_F20; // F20
                 break;
             default:
                 write_bitfield = false;
@@ -3323,6 +3347,7 @@ static int razer_raw_event(struct hid_device *hdev, struct hid_report *report, u
 
     switch (usb_dev->descriptor.idProduct) {
     case USB_DEVICE_ID_RAZER_BLACKWIDOW_V3:
+    case USB_DEVICE_ID_RAZER_BLACKWIDOW_V4_PRO:
     case USB_DEVICE_ID_RAZER_ORNATA_V2:
     case USB_DEVICE_ID_RAZER_BLACKWIDOW_V3_PRO_WIRED:
     case USB_DEVICE_ID_RAZER_HUNTSMAN_V2:
