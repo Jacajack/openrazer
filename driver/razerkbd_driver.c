@@ -11,6 +11,7 @@
 #include <linux/hid.h>
 #include <linux/dmi.h>
 
+#include "linux/input-event-codes.h"
 #include "usb_hid_keys.h"
 
 #include "razerkbd_driver.h"
@@ -27,24 +28,40 @@ MODULE_DESCRIPTION(DRIVER_DESC);
 MODULE_VERSION(DRIVER_VERSION);
 MODULE_LICENSE(DRIVER_LICENSE);
 
-// M1-M5 is F13-F17
-#define RAZER_MACRO_KEY 188 // 188 = KEY_F18
-#define RAZER_GAME_KEY 189 // 189 = KEY_F19
-#define RAZER_BRIGHTNESS_DOWN 190 // 190 = KEY_F20
-// F21 is used for touchpad disable, F22,F23 is touchpad enable
-#define RAZER_BRIGHTNESS_UP 194 // 194 = KEY_F24
-#define RAZER_FN 195
-
-#define KEY_FLAG_BLOCK 0b00000001
-
 // KEY_MACRO* has been added in Linux 5.5, so define ourselves for older kernels.
 // See also https://git.kernel.org/torvalds/c/b5625db
 #ifndef KEY_MACRO1
-#define KEY_MACRO1 0x290
-#define KEY_MACRO2 0x291
-#define KEY_MACRO3 0x292
-#define KEY_MACRO4 0x293
+#define KEY_MACRO1  0x290
+#define KEY_MACRO2  0x291
+#define KEY_MACRO3  0x292
+#define KEY_MACRO4  0x293
+#define KEY_MACRO5  0x294
+#define KEY_MACRO6  0x295
+#define KEY_MACRO7  0x296
+#define KEY_MACRO8  0x297
+#define KEY_MACRO9  0x298
+#define KEY_MACRO10 0x299
+#define KEY_MACRO11 0x2a0
+#define KEY_MACRO12 0x2a1
+// ...
+#define KEY_MACRO27 0x2aa
+#define KEY_MACRO28 0x2ab
+#define KEY_MACRO29 0x2ac
+#define KEY_MACRO30 0x2ad
 #endif
+
+
+// These are evdev key codes, not HID key codes.
+// Lower macro key codes are intended for the actual macro keys
+// Higher macro key codes are inteded for Chroma functions
+// FIXME some event codes are not working for some reason
+#define RAZER_MACRO_KEY KEY_MACRO30
+#define RAZER_GAME_KEY KEY_MACRO29
+#define RAZER_BRIGHTNESS_DOWN KEY_MACRO28
+#define RAZER_BRIGHTNESS_UP 163 // FIXME
+#define RAZER_FN 195
+
+#define KEY_FLAG_BLOCK 0b00000001
 
 /**
  * List of keys to swap
@@ -170,6 +187,7 @@ static const struct razer_key_translation chroma_keys_4[] = {
 };
 
 // Razer BlackWidow V3 (Full size)
+// Razer BlackWidow V4 Pro (Full size)
 static const struct razer_key_translation chroma_keys_5[] = {
     { KEY_F9, RAZER_MACRO_KEY },
     { KEY_F10, RAZER_GAME_KEY },
@@ -178,6 +196,23 @@ static const struct razer_key_translation chroma_keys_5[] = {
     { KEY_PAUSE, KEY_SLEEP },
     // TODO - Add KEY_CONTEXT_MENU when we figure out what it is supposed to be doing
     { 0 }
+};
+
+// FIXME probably unnecessary
+static const struct razer_key_translation f13_f24_to_macro_keys[] = {
+	{ KEY_F13, KEY_MACRO1 },
+	{ KEY_F14, KEY_MACRO2 },
+	{ KEY_F15, KEY_MACRO3 },
+	{ KEY_F16, KEY_MACRO4 },
+	{ KEY_F17, KEY_MACRO5 },
+	{ KEY_F18, KEY_MACRO6 },
+	{ KEY_F19, KEY_MACRO7 },
+	{ KEY_F20, KEY_MACRO8 },
+	{ KEY_F21, KEY_MACRO9 },
+	{ KEY_F22, KEY_MACRO10 },
+	{ KEY_F23, KEY_MACRO11 },
+	{ KEY_F24, KEY_MACRO12 },
+	{ 0 },
 };
 
 /**
@@ -2981,7 +3016,9 @@ static int razer_event(struct hid_device *hdev, struct hid_field *field, struct 
     struct usb_device *usb_dev = interface_to_usbdev(intf);
     struct razer_kbd_device *asc = hid_get_drvdata(hdev);
     const struct razer_key_translation *translation;
-    int do_translate = 0;
+    const struct razer_key_translation *macro_key_translation;
+
+	// printk("razer_event!\n");
 
     // No translations needed on the Blades
     if (is_blade_laptop(usb_dev)) {
@@ -3042,25 +3079,33 @@ static int razer_event(struct hid_device *hdev, struct hid_field *field, struct 
         break;
     }
 
-    if(translation) {
-        if(test_bit(usage->code, asc->pressed_fn)) {
-            do_translate = 1;
-        } else {
-            do_translate = asc->fn_on;
-        }
+	printk("event code: 0x%02x, type: 0x%02x, value: 0x%02x\n", usage->code, usage->type, value);
 
-        if(do_translate) {
+    if(translation) {
+		// printk("razer translation!\n");
+		printk("razer translation: 0x%02x --> 0x%02x\n", usage->code, translation->to);
+
+        if (test_bit(usage->code, asc->pressed_fn) || asc->fn_on) {
             if(value) {
                 set_bit(usage->code, asc->pressed_fn);
             } else {
                 clear_bit(usage->code, asc->pressed_fn);
             }
 
-            input_event(field->hidinput->input, usage->type, translation->to, value);
-            return 1;
+            input_event(field->hidinput->input,  usage->type, translation->to, value);
+            input_report_key(field->hidinput->input, translation->to, value);
+			input_sync(field->hidinput->input);
+			return 1;
         }
     }
 
+	// macro_key_translation = find_translation(f13_f24_to_macro_keys, usage->code);
+
+	// if (macro_key_translation) {
+	// 	printk("razer macro translation: 0x%02x --> 0x%02x\n", usage->code, macro_key_translation->to);
+	// 	input_event(field->hidinput->input, usage->type, macro_key_translation->to, value);
+	// 	return 1;
+	// }
 
     return 0;
 }
