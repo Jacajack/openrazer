@@ -11,6 +11,7 @@
 #include <linux/hid.h>
 #include <linux/dmi.h>
 
+#include "linux/input-event-codes.h"
 #include "usb_hid_keys.h"
 
 #include "razerkbd_driver.h"
@@ -27,24 +28,39 @@ MODULE_DESCRIPTION(DRIVER_DESC);
 MODULE_VERSION(DRIVER_VERSION);
 MODULE_LICENSE(DRIVER_LICENSE);
 
-// M1-M5 is F13-F17
-#define RAZER_MACRO_KEY 188 // 188 = KEY_F18
-#define RAZER_GAME_KEY 189 // 189 = KEY_F19
-#define RAZER_BRIGHTNESS_DOWN 190 // 190 = KEY_F20
-// F21 is used for touchpad disable, F22,F23 is touchpad enable
-#define RAZER_BRIGHTNESS_UP 194 // 194 = KEY_F24
-#define RAZER_FN 195
-
-#define KEY_FLAG_BLOCK 0b00000001
-
 // KEY_MACRO* has been added in Linux 5.5, so define ourselves for older kernels.
 // See also https://git.kernel.org/torvalds/c/b5625db
 #ifndef KEY_MACRO1
-#define KEY_MACRO1 0x290
-#define KEY_MACRO2 0x291
-#define KEY_MACRO3 0x292
-#define KEY_MACRO4 0x293
+#define KEY_MACRO1  0x290
+#define KEY_MACRO2  0x291
+#define KEY_MACRO3  0x292
+#define KEY_MACRO4  0x293
+#define KEY_MACRO5  0x294
+#define KEY_MACRO6  0x295
+#define KEY_MACRO7  0x296
+#define KEY_MACRO8  0x297
+#define KEY_MACRO9  0x298
+#define KEY_MACRO10 0x299
+#define KEY_MACRO11 0x2a0
+#define KEY_MACRO12 0x2a1
+// ...
+#define KEY_MACRO27 0x2aa
+#define KEY_MACRO28 0x2ab
+#define KEY_MACRO29 0x2ac
+#define KEY_MACRO30 0x2ad
 #endif
+
+
+// These are evdev key codes, not HID key codes.
+// Lower macro key codes are intended for the actual macro keys
+// Higher macro key codes are inteded for Chroma functions
+#define RAZER_MACRO_KEY KEY_MACRO30 // TODO maybe KEY_MACRO_RECORD_START?
+#define RAZER_GAME_KEY KEY_MACRO29 // TODO maybe KEY_GAMES?
+#define RAZER_BRIGHTNESS_DOWN KEY_MACRO28
+#define RAZER_BRIGHTNESS_UP KEY_MACRO27
+#define RAZER_FN 195
+
+#define KEY_FLAG_BLOCK 0b00000001
 
 /**
  * List of keys to swap
@@ -170,6 +186,7 @@ static const struct razer_key_translation chroma_keys_4[] = {
 };
 
 // Razer BlackWidow V3 (Full size)
+// Razer BlackWidow V4 Pro (Full size)
 static const struct razer_key_translation chroma_keys_5[] = {
     { KEY_F9, RAZER_MACRO_KEY },
     { KEY_F10, RAZER_GAME_KEY },
@@ -2981,7 +2998,6 @@ static int razer_event(struct hid_device *hdev, struct hid_field *field, struct 
     struct usb_device *usb_dev = interface_to_usbdev(intf);
     struct razer_kbd_device *asc = hid_get_drvdata(hdev);
     const struct razer_key_translation *translation;
-    int do_translate = 0;
 
     // No translations needed on the Blades
     if (is_blade_laptop(usb_dev)) {
@@ -3043,24 +3059,17 @@ static int razer_event(struct hid_device *hdev, struct hid_field *field, struct 
     }
 
     if(translation) {
-        if(test_bit(usage->code, asc->pressed_fn)) {
-            do_translate = 1;
-        } else {
-            do_translate = asc->fn_on;
-        }
-
-        if(do_translate) {
+        if (test_bit(usage->code, asc->pressed_fn) || asc->fn_on) {
             if(value) {
                 set_bit(usage->code, asc->pressed_fn);
             } else {
                 clear_bit(usage->code, asc->pressed_fn);
             }
 
-            input_event(field->hidinput->input, usage->type, translation->to, value);
-            return 1;
+            input_event(field->hidinput->input,  usage->type, translation->to, value);
+			return 1;
         }
     }
-
 
     return 0;
 }
@@ -4235,6 +4244,30 @@ static void razer_kbd_disconnect(struct hid_device *hdev)
 }
 
 /**
+ * Setup input device keybit mask
+ */
+static void razer_setup_key_bits(struct input_dev *input)
+{
+    __set_bit(EV_KEY, input->evbit);
+
+	// Chroma keys
+	__set_bit(RAZER_MACRO_KEY, input->keybit);
+	__set_bit(RAZER_GAME_KEY, input->keybit);
+	__set_bit(RAZER_BRIGHTNESS_DOWN, input->keybit);
+	__set_bit(RAZER_BRIGHTNESS_UP, input->keybit);
+	// __set_bit(RAZER_FN, input->keybit);
+}
+
+/**
+ * Setup the input device now that its been added to our struct
+ */
+static int razer_input_configured(struct hid_device *hdev, struct hid_input *hi)
+{
+	razer_setup_key_bits(hi->input);
+    return 0;
+}
+
+/**
  * Device ID mapping table
  */
 static const struct hid_device_id razer_devices[] = {
@@ -4341,6 +4374,7 @@ static struct hid_driver razer_kbd_driver = {
     .remove = razer_kbd_disconnect,
     .event = razer_event,
     .raw_event = razer_raw_event,
+    .input_configured = razer_input_configured,
 };
 
 module_hid_driver(razer_kbd_driver);
