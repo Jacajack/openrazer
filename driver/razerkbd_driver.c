@@ -54,11 +54,10 @@ MODULE_LICENSE(DRIVER_LICENSE);
 // These are evdev key codes, not HID key codes.
 // Lower macro key codes are intended for the actual macro keys
 // Higher macro key codes are inteded for Chroma functions
-// FIXME some event codes are not working for some reason
-#define RAZER_MACRO_KEY KEY_MACRO30
-#define RAZER_GAME_KEY KEY_MACRO29
+#define RAZER_MACRO_KEY KEY_MACRO30 // TODO maybe KEY_MACRO_RECORD_START?
+#define RAZER_GAME_KEY KEY_MACRO29 // TODO maybe KEY_GAMES?
 #define RAZER_BRIGHTNESS_DOWN KEY_MACRO28
-#define RAZER_BRIGHTNESS_UP 163 // FIXME
+#define RAZER_BRIGHTNESS_UP KEY_MACRO27
 #define RAZER_FN 195
 
 #define KEY_FLAG_BLOCK 0b00000001
@@ -3018,8 +3017,6 @@ static int razer_event(struct hid_device *hdev, struct hid_field *field, struct 
     const struct razer_key_translation *translation;
     const struct razer_key_translation *macro_key_translation;
 
-	// printk("razer_event!\n");
-
     // No translations needed on the Blades
     if (is_blade_laptop(usb_dev)) {
         return 0;
@@ -3079,12 +3076,8 @@ static int razer_event(struct hid_device *hdev, struct hid_field *field, struct 
         break;
     }
 
-	printk("event code: 0x%02x, type: 0x%02x, value: 0x%02x\n", usage->code, usage->type, value);
 
     if(translation) {
-		// printk("razer translation!\n");
-		printk("razer translation: 0x%02x --> 0x%02x\n", usage->code, translation->to);
-
         if (test_bit(usage->code, asc->pressed_fn) || asc->fn_on) {
             if(value) {
                 set_bit(usage->code, asc->pressed_fn);
@@ -3093,19 +3086,16 @@ static int razer_event(struct hid_device *hdev, struct hid_field *field, struct 
             }
 
             input_event(field->hidinput->input,  usage->type, translation->to, value);
-            input_report_key(field->hidinput->input, translation->to, value);
-			input_sync(field->hidinput->input);
 			return 1;
         }
     }
 
-	// macro_key_translation = find_translation(f13_f24_to_macro_keys, usage->code);
+	macro_key_translation = find_translation(f13_f24_to_macro_keys, usage->code);
 
-	// if (macro_key_translation) {
-	// 	printk("razer macro translation: 0x%02x --> 0x%02x\n", usage->code, macro_key_translation->to);
-	// 	input_event(field->hidinput->input, usage->type, macro_key_translation->to, value);
-	// 	return 1;
-	// }
+	if (macro_key_translation) {
+		input_event(field->hidinput->input, usage->type, macro_key_translation->to, value);
+		return 1;
+	}
 
     return 0;
 }
@@ -4280,6 +4270,44 @@ static void razer_kbd_disconnect(struct hid_device *hdev)
 }
 
 /**
+ * Setup input device keybit mask
+ */
+static void razer_setup_key_bits(struct input_dev *input)
+{
+    __set_bit(EV_KEY, input->evbit);
+
+	// Macro keys
+    __set_bit(KEY_MACRO1, input->keybit);
+    __set_bit(KEY_MACRO2, input->keybit);
+    __set_bit(KEY_MACRO3, input->keybit);
+    __set_bit(KEY_MACRO4, input->keybit);
+    __set_bit(KEY_MACRO5, input->keybit);
+    __set_bit(KEY_MACRO6, input->keybit);
+    __set_bit(KEY_MACRO7, input->keybit);
+    __set_bit(KEY_MACRO8, input->keybit);
+    __set_bit(KEY_MACRO9, input->keybit);
+    __set_bit(KEY_MACRO10, input->keybit);
+    __set_bit(KEY_MACRO11, input->keybit);
+    __set_bit(KEY_MACRO12, input->keybit);
+
+	// Chroma keys
+	__set_bit(RAZER_MACRO_KEY, input->keybit);
+	__set_bit(RAZER_GAME_KEY, input->keybit);
+	__set_bit(RAZER_BRIGHTNESS_DOWN, input->keybit);
+	__set_bit(RAZER_BRIGHTNESS_UP, input->keybit);
+	// __set_bit(RAZER_FN, input->keybit);
+}
+
+/**
+ * Setup the input device now that its been added to our struct
+ */
+static int razer_input_configured(struct hid_device *hdev, struct hid_input *hi)
+{
+	razer_setup_key_bits(hi->input);
+    return 0;
+}
+
+/**
  * Device ID mapping table
  */
 static const struct hid_device_id razer_devices[] = {
@@ -4386,6 +4414,7 @@ static struct hid_driver razer_kbd_driver = {
     .remove = razer_kbd_disconnect,
     .event = razer_event,
     .raw_event = razer_raw_event,
+    .input_configured = razer_input_configured,
 };
 
 module_hid_driver(razer_kbd_driver);
