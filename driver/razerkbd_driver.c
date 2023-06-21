@@ -197,23 +197,6 @@ static const struct razer_key_translation chroma_keys_5[] = {
     { 0 }
 };
 
-// FIXME probably unnecessary
-static const struct razer_key_translation f13_f24_to_macro_keys[] = {
-	{ KEY_F13, KEY_MACRO1 },
-	{ KEY_F14, KEY_MACRO2 },
-	{ KEY_F15, KEY_MACRO3 },
-	{ KEY_F16, KEY_MACRO4 },
-	{ KEY_F17, KEY_MACRO5 },
-	{ KEY_F18, KEY_MACRO6 },
-	{ KEY_F19, KEY_MACRO7 },
-	{ KEY_F20, KEY_MACRO8 },
-	{ KEY_F21, KEY_MACRO9 },
-	{ KEY_F22, KEY_MACRO10 },
-	{ KEY_F23, KEY_MACRO11 },
-	{ KEY_F24, KEY_MACRO12 },
-	{ 0 },
-};
-
 /**
  * Essentially search through the struct array above.
  */
@@ -3015,7 +2998,6 @@ static int razer_event(struct hid_device *hdev, struct hid_field *field, struct 
     struct usb_device *usb_dev = interface_to_usbdev(intf);
     struct razer_kbd_device *asc = hid_get_drvdata(hdev);
     const struct razer_key_translation *translation;
-    const struct razer_key_translation *macro_key_translation;
 
     // No translations needed on the Blades
     if (is_blade_laptop(usb_dev)) {
@@ -3076,7 +3058,6 @@ static int razer_event(struct hid_device *hdev, struct hid_field *field, struct 
         break;
     }
 
-
     if(translation) {
         if (test_bit(usage->code, asc->pressed_fn) || asc->fn_on) {
             if(value) {
@@ -3089,13 +3070,6 @@ static int razer_event(struct hid_device *hdev, struct hid_field *field, struct 
 			return 1;
         }
     }
-
-	macro_key_translation = find_translation(f13_f24_to_macro_keys, usage->code);
-
-	if (macro_key_translation) {
-		input_event(field->hidinput->input, usage->type, macro_key_translation->to, value);
-		return 1;
-	}
 
     return 0;
 }
@@ -4275,20 +4249,6 @@ static void razer_kbd_disconnect(struct hid_device *hdev)
 static void razer_setup_key_bits(struct input_dev *input)
 {
     __set_bit(EV_KEY, input->evbit);
-
-	// Macro keys
-    __set_bit(KEY_MACRO1, input->keybit);
-    __set_bit(KEY_MACRO2, input->keybit);
-    __set_bit(KEY_MACRO3, input->keybit);
-    __set_bit(KEY_MACRO4, input->keybit);
-    __set_bit(KEY_MACRO5, input->keybit);
-    __set_bit(KEY_MACRO6, input->keybit);
-    __set_bit(KEY_MACRO7, input->keybit);
-    __set_bit(KEY_MACRO8, input->keybit);
-    __set_bit(KEY_MACRO9, input->keybit);
-    __set_bit(KEY_MACRO10, input->keybit);
-    __set_bit(KEY_MACRO11, input->keybit);
-    __set_bit(KEY_MACRO12, input->keybit);
 
 	// Chroma keys
 	__set_bit(RAZER_MACRO_KEY, input->keybit);

@@ -134,8 +134,8 @@ EVENT_MAPPING = {
     111: 'DELETE', 113: 'MUTE', 114: 'VOL_DOWN', 115: 'VOL_UP', 119: 'PAUSE',
     125: 'SUPER', 127: 'CTXMENU',
     163: 'MEDIA_FORWARD', 164: 'MEDIA_PLAY', 165: 'MEDIA_BACK',
-    0x290: 'M1', 0x291: 'M2', 0x292: 'M3', 0x293: 'M4', 0x294: 'M5', 0x295: 'M6',
-    0x296: 'M7', 0x297: 'M8', 0x298: 'M9', 0x299: 'M10', 0x29a: 'M11', 0x29b: 'M12',
+    183: 'M1', 184: 'M2', 185: 'M3', 186: 'M4', 187: 'M5', 188: 'M6',
+    189: 'M7', 190: 'M8', 191: 'M9', 192: 'M10', 193: 'M11', 194: 'M12',
     0x2ad: 'MACROMODE', 0x2ac: 'GAMEMODE', 0x2ab: 'BRIGHTNESSDOWN', 0x2aa: 'BRIGHTNESSUP'
 }
 
