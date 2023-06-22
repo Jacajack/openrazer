@@ -3224,7 +3224,7 @@ static int razer_event(struct hid_device *hdev, struct hid_field *field, struct 
             }
 
             input_event(field->hidinput->input,  usage->type, translation->to, value);
-			return 1;
+            return 1;
         }
     }
 
@@ -4447,12 +4447,12 @@ static void razer_setup_key_bits(struct input_dev *input)
 {
     __set_bit(EV_KEY, input->evbit);
 
-	// Chroma keys
-	__set_bit(RAZER_MACRO_KEY, input->keybit);
-	__set_bit(RAZER_GAME_KEY, input->keybit);
-	__set_bit(RAZER_BRIGHTNESS_DOWN, input->keybit);
-	__set_bit(RAZER_BRIGHTNESS_UP, input->keybit);
-	// __set_bit(RAZER_FN, input->keybit);
+    // Chroma keys
+    __set_bit(RAZER_MACRO_KEY, input->keybit);
+    __set_bit(RAZER_GAME_KEY, input->keybit);
+    __set_bit(RAZER_BRIGHTNESS_DOWN, input->keybit);
+    __set_bit(RAZER_BRIGHTNESS_UP, input->keybit);
+    // __set_bit(RAZER_FN, input->keybit);
 }
 
 /**
@@ -4460,7 +4460,7 @@ static void razer_setup_key_bits(struct input_dev *input)
  */
 static int razer_input_configured(struct hid_device *hdev, struct hid_input *hi)
 {
-	razer_setup_key_bits(hi->input);
+    razer_setup_key_bits(hi->input);
     return 0;
 }
 
