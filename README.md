@@ -96,6 +96,9 @@ The devices below are fully feature supported by OpenRazer, which means all avai
 | Razer BlackWidow V4 Pro                       |  1532:028D  |
 | Razer DeathStalker V2 Pro (Wireless)          |  1532:0290  |
 | Razer DeathStalker V2 Pro (Wired)             |  1532:0292  |
+| Razer Ornata V3 X                             |  1532:0294  |
+| Razer DeathStalker V2 Pro TKL (Wireless)      |  1532:0296  |
+| Razer DeathStalker V2 Pro TKL (Wired)         |  1532:0298  |
 | Razer DeathStalker V2                         |  1532:0295  |
 | Razer BlackWidow V3 Tenkeyless                |  1532:0A24  |
 
@@ -173,7 +176,9 @@ The devices below are fully feature supported by OpenRazer, which means all avai
 | Razer Naga X                                  |  1532:0096  |
 | Razer DeathAdder Essential (2021)             |  1532:0098  |
 | Razer Basilisk V3                             |  1532:0099  |
+| Razer Pro Click Mini (Receiver)               |  1532:009A  |
 | Razer DeathAdder V2 X HyperSpeed              |  1532:009C  |
+| Razer DeathAdder V2 Lite                      |  1532:00A1  |
 | Razer Viper V2 Pro (Wired)                    |  1532:00A5  |
 | Razer Viper V2 Pro (Wireless)                 |  1532:00A6  |
 | Razer Basilisk V3 Pro (Wired)                 |  1532:00AA  |
@@ -225,6 +230,7 @@ The devices below are fully feature supported by OpenRazer, which means all avai
 | Razer Base Station V2 Chroma                  |  1532:0F20  |
 | Razer Thunderbolt 4 Dock Chroma               |  1532:0F21  |
 | Razer Charging Pad Chroma                     |  1532:0F26  |
+| Razer Laptop Stand Chroma V2                  |  1532:0F2B  |
 
 #### Determining the Device ID
 Razer devices use a USB VID (Vendor ID) of `1532`. You can identify the USB PID (Product ID) by typing:

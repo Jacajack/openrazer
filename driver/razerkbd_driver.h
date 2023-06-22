@@ -93,7 +93,10 @@
 #define USB_DEVICE_ID_RAZER_BLACKWIDOW_V4_PRO 0x028D
 #define USB_DEVICE_ID_RAZER_DEATHSTALKER_V2_PRO_WIRELESS 0x0290
 #define USB_DEVICE_ID_RAZER_DEATHSTALKER_V2_PRO_WIRED 0x0292
+#define USB_DEVICE_ID_RAZER_ORNATA_V3_X 0x0294
 #define USB_DEVICE_ID_RAZER_DEATHSTALKER_V2 0x0295
+#define USB_DEVICE_ID_RAZER_DEATHSTALKER_V2_PRO_TKL_WIRELESS 0x0296
+#define USB_DEVICE_ID_RAZER_DEATHSTALKER_V2_PRO_TKL_WIRED 0x0298
 #define USB_DEVICE_ID_RAZER_BLACKWIDOW_V3_TK 0x0A24
 
 /* Each keyboard report has 90 bytes*/
@@ -115,7 +118,6 @@
 
 #define RAZER_BLACKWIDOW_ULTIMATE_2016_EFFECT_STARLIGHT 0x19
 
-
 #define RAZER_BLACKWIDOW_CHROMA_EFFECT_SET_KEYS 9 //update profile needs to be called after setting keys to reflect changes
 #define RAZER_BLACKWIDOW_CHROMA_EFFECT_RESET 10
 #define RAZER_BLACKWIDOW_CHROMA_EFFECT_UNKNOWN 11
@@ -123,15 +125,11 @@
 #define RAZER_BLACKWIDOW_CHROMA_EFFECT_UNKNOWN3 13
 #define RAZER_BLACKWIDOW_CHROMA_EFFECT_UNKNOWN4 14
 
-
 #define RAZER_BLACKWIDOW_CHROMA_ROW_LEN 0x16
 #define RAZER_BLACKWIDOW_CHROMA_ROWS_NUM 6
 
-
 #define RAZER_STEALTH_ROW_LEN 0x10
 #define RAZER_STEALTH_ROWS_NUM 6
-
-
 
 #define RAZER_BLACKWIDOW_CHROMA_WAIT_MS 1
 #define RAZER_BLACKWIDOW_CHROMA_WAIT_MIN_US 600
@@ -146,15 +144,18 @@
 #define RAZER_FIREFLY_WAIT_MIN_US 900
 #define RAZER_FIREFLY_WAIT_MAX_US 1000
 
-
 struct razer_kbd_device {
+    struct usb_device *usb_dev;
+    struct mutex lock;
+    unsigned char usb_interface_protocol;
+    unsigned short usb_vid;
+    unsigned short usb_pid;
+
     unsigned int fn_on;
     DECLARE_BITMAP(pressed_fn, KEY_CNT);
 
     unsigned char block_keys[3];
     unsigned char left_alt_on;
 };
-
-
 
 #endif
