@@ -11,7 +11,6 @@
 #include <linux/hid.h>
 #include <linux/dmi.h>
 
-#include "linux/input-event-codes.h"
 #include "usb_hid_keys.h"
 
 #include "razerkbd_driver.h"
