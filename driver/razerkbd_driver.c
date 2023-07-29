@@ -2523,7 +2523,7 @@ static ssize_t razer_attr_write_matrix_effect_custom(struct device *dev, struct 
         request.transaction_id.id = 0x1F;
         break;
 
-    // Workaround for posible BlackWidow V4 Pro firmware
+    // Workaround for posible BlackWidow V4 Pro firmware bug
     // see: https://github.com/openrazer/openrazer/pull/2054
     case USB_DEVICE_ID_RAZER_BLACKWIDOW_V4_PRO:
         want_response = false;
@@ -2915,7 +2915,7 @@ static ssize_t razer_attr_write_matrix_custom_frame(struct device *dev, struct d
             request.transaction_id.id = 0x1F;
             break;
 
-        // Workaround for posible BlackWidow V4 Pro firmware
+        // Workaround for posible BlackWidow V4 Pro firmware bug
         // see: https://github.com/openrazer/openrazer/pull/2054
         case USB_DEVICE_ID_RAZER_BLACKWIDOW_V4_PRO:
             want_response = false;
