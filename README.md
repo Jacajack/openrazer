@@ -20,6 +20,7 @@ The devices below are fully feature supported by OpenRazer, which means all avai
 | Razer BlackWidow Ultimate 2012                |  1532:010D  |
 | Razer BlackWidow Classic (Alternate)          |  1532:010E  |
 | Razer Anansi                                  |  1532:010F  |
+| Razer DeathStalker (Essential)                |  1532:0118  |
 | Razer BlackWidow Ultimate 2013                |  1532:011A  |
 | Razer BlackWidow Stealth                      |  1532:011B  |
 | Razer BlackWidow Tournament Edition 2014      |  1532:011C  |
@@ -100,6 +101,7 @@ The devices below are fully feature supported by OpenRazer, which means all avai
 | Razer DeathStalker V2 Pro TKL (Wireless)      |  1532:0296  |
 | Razer DeathStalker V2 Pro TKL (Wired)         |  1532:0298  |
 | Razer DeathStalker V2                         |  1532:0295  |
+| Razer Blade 15 (2023)                         |  1532:029E  |
 | Razer BlackWidow V3 Tenkeyless                |  1532:0A24  |
 
 ### Mice

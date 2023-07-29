@@ -1131,6 +1131,20 @@ class RazerDeathStalkerExpert(_MacroKeyboard):
     DEVICE_IMAGE = "https://assets.razerzone.com/eeimages/support/products/49/49_razer_deathstalker.png"
 
 
+class RazerDeathStalkerEssential(_MacroKeyboard):
+    """
+    Class for the Razer DeathStalker/DeathStalker Essential
+    """
+    EVENT_FILE_REGEX = re.compile(r'.*Razer_DeathStalker(-if01)?-event-kbd')
+
+    USB_VID = 0x1532
+    USB_PID = 0x0118
+    METHODS = ['get_device_type_keyboard', 'get_game_mode', 'set_game_mode', 'set_macro_mode', 'get_macro_mode',
+               'get_macro_effect', 'set_macro_effect', 'bw_set_pulsate', 'bw_set_static', 'get_macros', 'delete_macro', 'add_macro']
+
+    DEVICE_IMAGE = "https://assets.razerzone.com/eeimages/support/products/49/49_razer_deathstalker.png"
+
+
 class RazerDeathStalkerChroma(_RippleKeyboard):
     """
     Class for the Razer DeathStalker Chroma
@@ -1870,3 +1884,21 @@ class RazerBlackWidowV4Pro(_RippleKeyboard):
                'set_ripple_effect', 'set_ripple_effect_random_colour']
 
     DEVICE_IMAGE = "https://dl.razerzone.com/src2/9703/9703-1-en-v1.png"
+
+class RazerBlade152023(_RippleKeyboard):
+    """
+    Class for the Razer Blade 15 (2023)
+    """
+    EVENT_FILE_REGEX = re.compile(r'.*Razer_Blade(-if01)?-event-kbd')
+
+    USB_VID = 0x1532
+    USB_PID = 0x029E
+    HAS_MATRIX = True
+    MATRIX_DIMS = [6, 16]
+    METHODS = ['get_device_type_keyboard', 'get_logo_active', 'set_logo_active', 'set_wave_effect', 'set_static_effect', 'set_spectrum_effect',
+               'set_reactive_effect', 'set_none_effect', 'set_breath_random_effect', 'set_breath_single_effect',
+               'set_breath_dual_effect', 'set_custom_effect', 'set_key_row',
+               'set_starlight_random_effect', 'set_starlight_single_effect', 'set_starlight_dual_effect',
+               'set_ripple_effect', 'set_ripple_effect_random_colour']
+
+    DEVICE_IMAGE = "https://dl.razerzone.com/src2/9696/9696-1-en-v2.png"
